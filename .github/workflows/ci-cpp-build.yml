@@ -48,3 +48,27 @@ jobs:
         with:
           name: docker-layer-cache
           path: /tmp/.buildx-cache
+
+  run_tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download Docker layer cache
+        id: download-docker-layer-cache
+        uses: actions/cache@v3
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-docker-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-docker-
+
+      - name: Load Docker image from cache
+        run: |
+          docker buildx build --load --cache-from=type=local,src=/tmp/.buildx-cache -t my-cpp-image -f docker/image/Dockerfile .
+
+      - name: Run custom script "run.sh"
+        run: |
+          docker run --rm -v $(pwd):/workspace -w /workspace my-cpp-image bash docker/run_tasks/run.sh
