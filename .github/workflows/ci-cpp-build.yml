@@ -15,6 +15,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Get Docker cache digest
+        id: get-cache-digest
+        run: echo "::set-output name=digest::$(sha256sum docker-compose.yml | awk '{ print $1 }')"
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
@@ -23,7 +27,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-docker-${{ github.sha }}
+          key: ${{ runner.os }}-docker-${{ steps.get-cache-digest.outputs.digest }}
           restore-keys: |
             ${{ runner.os }}-docker-
 
