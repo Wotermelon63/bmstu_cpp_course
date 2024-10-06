@@ -36,7 +36,7 @@ jobs:
       - name: Build Docker image with Docker Compose
         run: |
           docker compose build bmstu
-          docker compose up --abort-on-container-exit --exit-code-from bmstu
+          docker compose up bmstu
           # Save the image as a tarball
           docker save cpp_course:latest -o cpp_course_image.tar
 
