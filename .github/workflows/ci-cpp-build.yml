@@ -38,10 +38,9 @@ jobs:
 
       - name: Build and Run Docker Containers
         run: |
-          docker compose build \
-            --cache-from=type=local,src=/tmp/.buildx-cache \
-            --cache-to=type=local,dest=/tmp/.buildx-cache,mode=max
+          docker buildx build --cache-from=type=local,src=/tmp/.buildx-cache --cache-to=type=local,dest=/tmp/.buildx-cache,mode=max .
           docker compose up --abort-on-container-exit --exit-code-from bmstu
+
 
       - name: Save Docker layer cache
         if: always()
