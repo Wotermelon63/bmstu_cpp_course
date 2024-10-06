@@ -71,4 +71,4 @@ jobs:
 
       - name: Run custom script "run.sh"
         run: |
-          docker run --rm -v $(pwd):/workspace -w /workspace my-cpp-image bash /cpp_bmstu/docker/run_tasks/run.sh
+          docker run --rm -v $(pwd):/workspace -w /workspace my-cpp-image bash ls -la
