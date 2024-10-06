@@ -19,14 +19,29 @@ jobs:
         uses: docker/setup-buildx-action@v2
 
       - name: Cache Docker layers
+        id: cache-docker-layers
         uses: actions/cache@v3
         with:
           path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          key: ${{ runner.os }}-docker-${{ github.sha }}
           restore-keys: |
-            ${{ runner.os }}-buildx-
+            ${{ runner.os }}-docker-
 
-      - name: Compose Build and Push
+      - name: Run docker-compose
+        uses: hoverkraft-tech/compose-action@v2.0.1
+        with:
+          compose-file: "docker-compose.yml"
+
+      - name: Build and Run Docker Containers
         run: |
-          docker compose build --cache-from type=local,src=/tmp/.buildx-cache --cache-to type=local,dest=/tmp/.buildx-cache
+          docker compose build \
+            --cache-from=type=local,src=/tmp/.buildx-cache \
+            --cache-to=type=local,dest=/tmp/.buildx-cache,mode=max
           docker compose up --abort-on-container-exit --exit-code-from bmstu
+
+      - name: Save Docker layer cache
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: docker-layer-cache
+          path: /tmp/.buildx-cache
